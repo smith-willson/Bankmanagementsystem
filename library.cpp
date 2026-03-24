@@ -1,19 +1,27 @@
 #include "Library.h"
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
-// -------------------- Show Only Available Resources --------------------
+// -------------------- Show (Available) Resources Only--------------------
 void Library::showAvailableResources() const
 {
+    cout << "\nAvailable Resources in " << libraryName << endl;
+    cout << left << setw(6)  << "ID"
+                 << setw(35) << "Title"
+                 << setw(15) << "Type"
+                 << setw(15) << "Available" << endl;
+    cout << string(71, '-') << endl;
+
     bool found = false;
-
-    cout << "\nAvailable Resources:\n";
-
     for (auto res : resources)
     {
         if (res->getAvailableCopies() > 0)
         {
-            res->displayInfo();  // polymorphic call
+            cout << left << setw(6)  << res->getResourceID()
+                         << setw(35) << res->getTitle()
+                         << setw(15) << res->getType()
+                         << setw(15) << res->getAvailableCopies() << endl;
             found = true;
         }
     }
@@ -22,7 +30,7 @@ void Library::showAvailableResources() const
         cout << "No resources currently available.\n";
 }
 
-// -------------------- Register New User --------------------
+// -------------------- Add New User --------------------
 void Library::registerUser()
 {
     string name, username, password, address;
@@ -41,7 +49,7 @@ void Library::registerUser()
     cin >> ws;
     getline(cin, address);
 
-    int newID = users.size() + 1;  // generate simple new ID
+    int newID = users.size() + 1;  // ID allotment
 
     User* newUser = new User(newID, "user", username, password, name, address, 0.0);
     users.push_back(newUser);
@@ -49,14 +57,14 @@ void Library::registerUser()
     cout << "User registered successfully!\n";
 }
 
-// -------------------- Search Resources (Full: title, author, category, type) --------------------
+// -------------------- Search Resources --------------------
 void Library::searchResources() const
 {
     int choice;
     string keyword;
     bool found = false;
 
-    cout << "Search by:\n";
+    cout << "\nSearch by:\n";
     cout << "1. Title\n";
     cout << "2. Author/Creator\n";
     cout << "3. Category\n";
@@ -64,55 +72,59 @@ void Library::searchResources() const
     cout << "Enter choice: ";
     cin >> choice;
 
-    cin.ignore(); // flush newline
+    cin.ignore();
 
     cout << "Enter keyword: ";
     getline(cin, keyword);
 
     cout << "\nSearch Results:\n";
+    cout << left << setw(6)  << "ID"
+                 << setw(35) << "Title"
+                 << setw(15) << "Type"
+                 << setw(15) << "Available" << endl;
+    cout << string(71, '-') << endl;
 
     for (auto res : resources)
     {
+        bool match = false;
+
         switch (choice)
         {
-            case 1: // Title
+            case 1: //for Title
                 if (res->getTitle().find(keyword) != string::npos)
-                {
-                    res->displayInfo();
-                    found = true;
-                }
+                    match = true;
                 break;
 
-            case 2: // Author/Creator
+            case 2: // for Author/creator
                 if (res->getAuthorCreator().find(keyword) != string::npos)
-                {
-                    res->displayInfo();
-                    found = true;
-                }
+                    match = true;
                 break;
 
-            case 3: // Category
+            case 3: // for Category
                 if (res->getCategory().find(keyword) != string::npos)
-                {
-                    res->displayInfo();
-                    found = true;
-                }
+                    match = true;
                 break;
 
-            case 4: // Type
+            case 4: // for Type
                 if (res->getType().find(keyword) != string::npos)
-                {
-                    res->displayInfo();
-                    found = true;
-                }
+                    match = true;
                 break;
 
             default:
                 cout << "Invalid choice!\n";
                 return;
         }
+
+        if (match)
+        {
+            cout << left << setw(6)  << res->getResourceID()
+                         << setw(35) << res->getTitle()
+                         << setw(15) << res->getType()
+                         << setw(15) << res->getAvailableCopies() << endl;
+            found = true;
+        }
     }
 
     if (!found)
-        cout << "NOT FOUND!!!.\n USE DIFFERENT KEYWORDS";
+        cout << "No matching resources found.\n";
 }
